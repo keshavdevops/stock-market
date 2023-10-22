@@ -126,7 +126,7 @@ driver.quit()
 
 
 import sys
-sys.path.append('/home/keshav/VsCode/Post_mail')
+sys.path.append('/home/keshav/Projects/Post_mail')
 import mailer
 
 
