@@ -11,6 +11,25 @@ driver = webdriver.Firefox()
 driver.get('https://www.screener.in/screens/71064/all-stocks/')
 wait = WebDriverWait(driver, 10)
 
+def mail():
+    try:
+        import sys
+        sys.path.append('/home/keshav/Projects/Post_mail')
+        import mailer
+
+
+        subject = f"Stock file {datetime.date.today()}"
+        body = f"complete screener python scraping code executed on {datetime.datetime.now()}"
+        path  = [file]
+
+        mail = mailer.mailing(sender="gkeshav911@gmail.com", receiver="niharikahandicrafts1726@gmail.com",
+                            sender_password="etajhpxanumrxfpx")
+
+        # With attachment
+        mail.compose_mail(subject, body, file_paths=path)
+    except:
+        print('mail not send')
+        
 
 def login(username, password):
     edit_columns = driver.find_element(By.CSS_SELECTOR, 'a.button:nth-child(4)')
@@ -31,7 +50,6 @@ def login(username, password):
 
     click_login = driver.find_element(By.CSS_SELECTOR, 'button.button-primary')
     click_login.click()
-
 
 
 def select_verticals():
@@ -66,6 +84,7 @@ def select_verticals():
     save_vertical = driver.find_element(By.CSS_SELECTOR, 'button.button-primary')
     save_vertical.click()
 
+def pagination():
     page_limit = driver.find_element(By.CSS_SELECTOR, 'div.options:nth-child(2) > a:nth-child(1)')
     page_limit.click()
 
@@ -74,69 +93,61 @@ def select_verticals():
     page_limit.click()
 
 
-login('kg829041@gmail.com', 'Keshav1234k')
-select_verticals()
+file = f'/home/keshav/Downloads/stock_market/stock_data_{datetime.date.today()}.xlsx'
+try:
+    login('kg829041@gmail.com', 'Keshav1234k')
+    select_verticals()
+    pagination()
 
-stocks_table = []
+    stocks_table = []
 
-state = True
-while state:
-    try:
-        wait.until(EC.presence_of_element_located((By.TAG_NAME, 'tbody')))
-    except Exception as e:
-        time.sleep(10)
-        print(e)
-        driver.refresh()
-        wait.until(EC.presence_of_element_located((By.TAG_NAME, 'tbody')))
+    state = True
+    while state:
+        try:
+            wait.until(EC.presence_of_element_located((By.TAG_NAME, 'tbody')))
+        except Exception as e:
+            time.sleep(10)
+            print(e)
+            driver.refresh()
+            wait.until(EC.presence_of_element_located((By.TAG_NAME, 'tbody')))
 
-    page_source = driver.page_source
+        page_source = driver.page_source
 
-    page_soup = BeautifulSoup(page_source, 'lxml')
-    body = page_soup.find('tbody')
-    table = body.find_all('tr')
-    for rows in table:
-        head_row = table[0].find_all('th')
-        row_values = rows.find_all('td')
-        dis = {}
+        page_soup = BeautifulSoup(page_source, 'lxml')
+        body = page_soup.find('tbody')
+        table = body.find_all('tr')
+        for rows in table:
+            head_row = table[0].find_all('th')
+            row_values = rows.find_all('td')
+            dis = {}
 
-        if len(row_values) != 0:
-            for head,row_value in zip(head_row, row_values):
-                head = head.text
-                row_ = row_value.text
-        
-                dis[head.strip()] = row_.strip()  # Remove leading and trailing whitespace
-            print(dis)
-            stocks_table.append(dis)
-    time.sleep(1)
-    try:
-        next_page = driver.find_element(By.CLASS_NAME, 'icon-right')
-        next_page.click()
-    except Exception as e:
-        print(f'\nnext page error \n\n\n')
-        state = False
-
-print(f'\n\nTotal stock scraped {len(stocks_table)}')
-file = f'/home/keshav/Downloads/stock_market/stock_data_{datetime.date.today()}.csv'
-df = pd.DataFrame(stocks_table)
-
-df.to_csv(file)
+            if len(row_values) != 0:
+                for head,row_value in zip(head_row, row_values):
+                    head = head.text
+                    row_ = row_value.text
+            
+                    dis[head.strip()] = row_.strip()  # Remove leading and trailing whitespace
+                # print(dis)
+                stocks_table.append(dis)
+        time.sleep(1)
+        try:
+            next_page = driver.find_element(By.CLASS_NAME, 'icon-right')
+            next_page.click()
+        except Exception as e:
+            print(f'\nlanded on last page \n\n')
+            state = False
+            
+    print(f'\nTotal stock scraped {len(stocks_table)}')
+    df = pd.DataFrame(stocks_table)
+    df.to_excel(file)
+    print(f'saved file {file}')
+except:
+    pass
 
 time.sleep(3)
+driver.close()
 driver.quit()
 
+mail()
 
-import sys
-sys.path.append('/home/keshav/Projects/Post_mail')
-import mailer
-
-
-subject = f"Stock file {datetime.date.today()}"
-body = f"complete screener python scraping code executed on {datetime.datetime.now()}"
-path  = [file]
-
-mail = mailer.mailing(sender="gkeshav911@gmail.com", receiver="niharikahandicrafts1726@gmail.com",
-                       sender_password="etajhpxanumrxfpx")
-
-# With attachment
-mail.compose_mail(subject, body, file_paths=path)
 

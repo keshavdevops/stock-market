@@ -1,0 +1,15 @@
+
+Message: 
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:189:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:507:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:132:16
+
+
+landed on last page 
+
+
+
+Total stock scraped 4441
+saved file /home/keshav/Downloads/stock_market/stock_data_2023-10-27.xlsx
