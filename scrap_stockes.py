@@ -5,11 +5,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.firefox.options import Options
 import time
 
-driver = webdriver.Firefox()
-driver.get('https://www.screener.in/screens/71064/all-stocks/')
-wait = WebDriverWait(driver, 10)
 
 def mail():
     try:
@@ -93,6 +91,14 @@ def pagination():
     page_limit.click()
 
 
+firefox_options = Options()
+firefox_options.add_argument('-headless')
+
+driver = webdriver.Firefox(options=firefox_options)
+driver.get('https://www.screener.in/screens/71064/all-stocks/')
+wait = WebDriverWait(driver, 10)
+
+
 file = f'/home/keshav/Downloads/stock_market/stock_data_{datetime.date.today()}.xlsx'
 try:
     login('kg829041@gmail.com', 'Keshav1234k')
@@ -134,10 +140,10 @@ try:
             next_page = driver.find_element(By.CLASS_NAME, 'icon-right')
             next_page.click()
         except Exception as e:
-            print(f'\nlanded on last page \n\n')
+            print(f'landed on last page \n')
             state = False
             
-    print(f'\nTotal stock scraped {len(stocks_table)}')
+    print(f'Total stock scraped {len(stocks_table)}')
     df = pd.DataFrame(stocks_table)
     df.to_excel(file)
     print(f'saved file {file}')
@@ -149,5 +155,5 @@ driver.close()
 driver.quit()
 
 mail()
-
+print('\n***************************************************************************\n')
 
